@@ -6,6 +6,7 @@ namespace RxResque\Channel;
 use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\Stream\Stream;
+use RxResque\Exception\ContextException;
 
 class Channel implements ChannelInterface, StreamChannelInterface
 {
@@ -26,13 +27,8 @@ class Channel implements ChannelInterface, StreamChannelInterface
      */
     public function send($data)
     {
-        try {
-            $serialized = serialize($data);
-            $this->write->write($serialized);
-        } catch (\Throwable $exception) {
-            file_put_contents( __DIR__ . '/log.log', $exception->getMessage(), FILE_APPEND);
-            die;
-        }
+        $serialized = serialize($data);
+        $this->write->write($serialized);
     }
 
     /**
@@ -42,15 +38,22 @@ class Channel implements ChannelInterface, StreamChannelInterface
     {
         $deferred = new Deferred();
 
-        $this->read->once('data', function ($raw) use ($deferred) {
+        $onData = function ($raw) use ($deferred) {
             $data = unserialize($raw);
             $deferred->resolve($data);
-        });
+        };
 
-        $this->write->once('close', function () use ($deferred) {
-            $deferred->reject(new \Exception('lolololable'));
-        });
+        $onClose = function () use ($deferred) {
+            $deferred->reject(new ContextException('Context has died'));
+        };
 
-        return $deferred->promise();
+        $this->read->on('data', $onData);
+        $this->write->on('close', $onClose);
+
+        return $deferred->promise()
+            ->always(function () use ($onData, $onClose) {
+                $this->read->removeListener('data', $onData);
+                $this->write->removeListener('close', $onClose);
+            });
     }
 }
