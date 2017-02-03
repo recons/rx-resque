@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 01.02.17
- * Time: 22:24
- */
+declare(strict_types = 1);
 
 namespace RxResque\Task;
 

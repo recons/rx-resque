@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 28.01.17
- * Time: 21:52
- */
+declare(strict_types=1);
 
 namespace RxResque\Worker;
 
@@ -14,7 +9,6 @@ use React\Promise\Promise;
 use RxResque\Process\ChanneledProcess;
 use RxResque\StrandInterface;
 use RxResque\Task\TaskInterface;
-use RxResque\Task\TaskResultInterface;
 
 class ProcessWorker implements WorkerInterface
 {
@@ -79,9 +73,6 @@ class ProcessWorker implements WorkerInterface
                 $this->strand->send($task);
                 $deferred->resolve(
                     $this->strand->receive()
-                        ->then(function (TaskResultInterface $taskResult) {
-                            return $taskResult->getResult();
-                        })
                         ->always(function () {
                             $this->isIdle = true;
                         })

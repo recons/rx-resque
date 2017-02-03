@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 28.01.17
- * Time: 22:13
- */
+declare(strict_types = 1);
 
 namespace RxResque\Process;
 
@@ -30,7 +25,7 @@ class ChanneledProcess implements ProcessInterface, StrandInterface
     {
         $this->loop = $loop;
 
-        $command = \PHP_BINARY . " " . \escapeshellarg($path);
+        $command = PHP_BINARY . " " . escapeshellarg($path);
         $this->process = new Process($command, $cwd, $env);
     }
 

@@ -1,12 +1,8 @@
 <?php
-/**
- * Created by Sergey Gorodnichev
- * @email sergey.gor@livetex.ru
- */
+declare(strict_types = 1);
 
 namespace RxResque\Rx\Operator;
 
-use Rx\Disposable\CallbackDisposable;
 use Rx\ObservableInterface;
 use Rx\ObserverInterface;
 use Rx\Operator\OperatorInterface;

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 28.01.17
- * Time: 14:42
- */
 
 namespace RxResque\Worker;
 

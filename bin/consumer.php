@@ -19,7 +19,7 @@ $pollRedis = function ($queue, $interval = 10) use ($client) {
 
 $pauser = new \Rx\Subject\Subject();
 
-$pool = new WorkerPool($loop, 0, 4);
+$pool = new WorkerPool($loop, 1, 1);
 $pool->on('status', function ($isIdle) use ($pauser) {
     $pauser->onNext($isIdle);
 });
@@ -28,8 +28,8 @@ $consumed = 0;
 
 /** @var Observable $redisStream */
 $redisStream = Observable::start(function () {})
-    ->flatMap(function () use ($pollRedis) {
-        return Rx\React\Promise::toObservable($pollRedis('queue'));
+    ->flatMap(function () use ($pollRedis, $loop) {
+        return Rx\React\Promise::toObservable($pollRedis('queue', 10));
     })
     ->repeat()
     ->_RxResque_pausable($pauser);
@@ -53,7 +53,7 @@ $taskStream->subscribeCallback(
                 echo "TaskException with error {$exception->getMessage()}\n";
             })
             ->otherwise(function (\React\Promise\Timer\TimeoutException $exception) {
-                echo "TIMEOUT {$exception->getMessage()}\n";
+                echo "TIMEOUT {$exception->getMessage()} \n";
             })
             ->otherwise(function (\RxResque\Exception\ContextException $exception) {
                 echo "Context exception '{$exception->getMessage()}' occurred! Retrying...\n";
@@ -71,13 +71,19 @@ $taskStream->subscribeCallback(
     }
 );
 
-//$loop->addTimer(12, function () use ($pauser) {
-//   $pauser->onCompleted();
+//$i = 0;
+//$loop->addPeriodicTimer(0.001, function () use (&$i) {
+//    ++$i;
 //});
 
-$loop->addPeriodicTimer(20, function () use ($pool, &$consumed) {
+/*$client->rpush('queue', 123)
+    ->then(function () use ($now) {
+        printf("%s seconds\n", time() - $now);
+    });*/
+
+/*$loop->addPeriodicTimer(20, function () use ($pool, &$consumed) {
    printf("Active: %d, Free: %d, Consumed: %d\n", $pool->getBusyWorkerCount(), $pool->getIdleWorkerCount(), $consumed);
-});
+});*/
 
 $pool->start();
 $loop->run();

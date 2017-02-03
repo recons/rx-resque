@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 28.01.17
- * Time: 14:47
- */
+declare(strict_types=1);
 
 namespace RxResque\Worker;
 
@@ -14,6 +9,7 @@ use React\Promise\Promise;
 use React\Promise\Timer\TimeoutException;
 use RxResque\Exception\ContextException;
 use RxResque\Task\TaskInterface;
+use RxResque\Task\TaskResultInterface;
 
 class WorkerPool extends EventEmitter implements PoolInterface
 {
@@ -159,6 +155,9 @@ class WorkerPool extends EventEmitter implements PoolInterface
             });
 
         return \React\Promise\Timer\timeout($promise, 5, $this->loop)
+            ->then(function (TaskResultInterface $taskResult) {
+                return $taskResult->getResult();
+            })
             ->otherwise(function (TimeoutException $exception) use ($worker) {
                 $worker->kill();
                 throw $exception;

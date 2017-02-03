@@ -1,8 +1,5 @@
 <?php
-/**
- * Created by Sergey Gorodnichev
- * @email sergey.gor@livetex.ru
- */
+declare(strict_types=1);
 
 namespace RxResque\Client;
 
@@ -54,11 +51,11 @@ class RedisClient
      */
     public function close()
     {
-        return $this->client->then(function (Client $client) {
+        return $this->client->then(
+            function (Client $client) {
                 return $client->close();
-            }, function (\Exception $e) {
-                throw $e;
-            });
+            }
+        );
     }
 
     /**
@@ -71,10 +68,10 @@ class RedisClient
      */
     public function __call($name, array $arguments)
     {
-        return $this->client->then(function (Client $client) use ($name, $arguments) {
-            return call_user_func_array([$client, $name], $arguments);
-        }, function (\Exception $e) {
-            throw $e;
-        });
+        return $this->client->then(
+            function (Client $client) use ($name, $arguments) {
+                return call_user_func_array([$client, $name], $arguments);
+            }
+        );
     }
 }

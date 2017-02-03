@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 01.02.17
- * Time: 20:05
- */
+declare(strict_types = 1);
 
 namespace RxResque\Channel;
 
@@ -31,8 +26,13 @@ class Channel implements ChannelInterface, StreamChannelInterface
      */
     public function send($data)
     {
-        $serialized = serialize($data);
-        $this->write->write($serialized);
+        try {
+            $serialized = serialize($data);
+            $this->write->write($serialized);
+        } catch (\Throwable $exception) {
+            file_put_contents( __DIR__ . '/log.log', $exception->getMessage(), FILE_APPEND);
+            die;
+        }
     }
 
     /**
@@ -43,11 +43,13 @@ class Channel implements ChannelInterface, StreamChannelInterface
         $deferred = new Deferred();
 
         $this->read->once('data', function ($raw) use ($deferred) {
-           $data = unserialize($raw);
-           $deferred->resolve($data);
+            $data = unserialize($raw);
+            $deferred->resolve($data);
         });
 
-        $this->read->once('close', [$deferred, 'reject']);
+        $this->write->once('close', function () use ($deferred) {
+            $deferred->reject(new \Exception('lolololable'));
+        });
 
         return $deferred->promise();
     }

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 29.01.17
- * Time: 15:26
- */
 
 namespace RxResque;
 
@@ -24,10 +18,8 @@ class SampleTask implements TaskInterface
      */
     public function run()
     {
-        $sleep = rand(6, 9);
-        /*if ($sleep == 4 || $sleep == 5) {
-            throw new \Exception('kek, i happened');
-        }*/
-        sleep($sleep);
+        sleep(3);
+        $i = 1;
+        return '123';
     }
 }

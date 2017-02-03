@@ -2,7 +2,7 @@
     "name": "recons/rx-resque",
     "version": "0.0.1",
     "require": {
-        "react/event-loop": "^0.4.2",
+        "react/event-loop": "dev-master as 0.4.2",
         "react/promise": "^2.5",
         "reactivex/rxphp": "^1.5",
         "clue/redis-react": "^1.0",
@@ -19,5 +19,5 @@
             "RxResque\\": "src"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

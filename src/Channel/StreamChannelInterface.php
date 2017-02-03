@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sergey
- * Date: 01.02.17
- * Time: 20:57
- */
 
 namespace RxResque\Channel;
 
